@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Monkey Sense</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+    <!-- import daisyui and tailwind -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- import jquery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <!-- import fontawesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body>
+
+    <!-- settings modal -->
+    <dialog id="my_modal_1" class="modal">
+      <div class="modal-box">
+        <h3 class="text-4xl font-bold text-center mb-[3vh]">Monkey Sense 2.0 Settings</h3>
+        <label class="label cursor-pointer">
+          <span class="label-text text-xl font-semibold">Require Enter</span>
+          <input name="requireenter" id="requireenter" type="checkbox" checked="checked" tabindex="-1" class="checkbox checkbox-neutral">
+        </label>
+        <label class="label cursor-pointer">
+          <span class="label-text text-xl font-semibold">Hardcore</span>
+          <input name="hardcore" id="hardcore" type="checkbox" tabindex="-1" class="checkbox checkbox-neutral">
+        </label>
+        <label class="label cursor-pointer">
+          <span class="label-text text-xl font-semibold">Test Mode</span>
+          <input name="testmode" id="testmode" type="checkbox" tabindex="-1" class="checkbox checkbox-neutral">
+        </label>
+        <label class="label cursor-pointer">
+          <span class="label-text text-xl font-semibold">Test Mode Questions</span>
+          <select name="testlength" id="testlength" tabindex="-1" class="select select-bordered max-w-xs">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="40">40</option>
+            <option value="80" selected>80</option>
+            <option value="120">120</option>
+            <option value="160">160</option>
+          </select>
+        </label>
+        <label class="label cursor-pointer">
+          <span class="label-text text-xl font-semibold">Mode</span>
+          <select name="mode" id="mode" tabindex="-1" class="select select-bordered max-w-xs">
+            <option value="ns">Number Sense</option>
+            <option value="zetamac">Zetamac</option>
+            <option value="estimate">Estimate</option>
+          </select>
+        </label>
+        <div class="modal-action w-full">
+          <form method="dialog">
+            <!-- if there is a button in form, it will close the modal -->
+            <button class="btn btn-error text-white text-xl font-semibold">Close Settings</button>
+            
+          </form>
+        </div>
+      </div>
+    </dialog>
+    
+    <div id="stats" class="flex text-2xl font-semibold h-auto z-0">
+      <div id="roundNumber" class="left-8 top-6 text-5xl font-bold h-auto absolute text-orange-500 p-4 bg-base-200 rounded-xl hidden lg:block">Monkey Sense 2.0</div>
+      <!--
+      <div class="left-[50%] transform -translate-x-1/2 top-12 absolute text-3xl">
+        <p>Current Time: 0ms</p>
+        <p>Average Time: 0ms</p>
+      </div>
+    -->
+      <div id="otherStats" class="flex flex-row gap-0 right-12 top-9 text-4xl font-semibold h-auto absolute">
+        <span id="correct" class="text-white bg-success p-[7px] rounded-l-xl">0<i class="fa fa-check pl-1"></i></span>
+        <span id="wrong" class="text-white bg-error p-[7px]">0<i class="fa fa-times pl-1"></i></span>
+        <span id="streak" class="text-white bg-warning p-[7px]">0<i class="fa fa-dashboard pl-2"></i></span>
+        <span id="settings" class="text-white bg-neutral-content p-[7px] rounded-r-xl cursor-pointer" onclick="my_modal_1.showModal();"><i class="fa fa-gear pl-1 pr-1"></i></span>
+      </div>
+    </div>
+
+    <!-- main div -->
+    <div class="flex flex-col justify-center items-center h-screen mt-[-52px] gap-5 w-full">
+      <!--<h1 class="text-8xl font-extrabold mb-[10vh]">Monkey Sense</h1>-->
+      <h3 class="text-5xl font-bold" id="question">Waiting for round to be started...</h3>
+      <input class="input input-neutral input-bordered w-1/3 mt-12 text-center" name="inputbox" id="inputbox" autocomplete="off" type="text" oninput="onInputChange(this)" onkeydown="onEnterPressed(event, this);"><br>
+      <div class="flex !flex-row justify-center items-center w-full gap-10 mt-[-10px]">
+        <button id="start" onclick="doStart();" class="btn btn-success w-1/5 text-white text-2xl font-bold border-0">Start Round</button>
+        <button id="stop" onclick="doStop();" class="btn btn-error w-1/5 text-white text-2xl font-bold border-0">Stop Round</button>
+      </div>
+      <style>
+        #start {
+          box-shadow: 0px 15px 30px 0px rgba(0, 169, 110, 0.5), inset 0px -15px 16px 0px rgba(0, 169, 110, 0.6), inset 0px 7px 15px 0px rgb(0, 220, 143);
+        }
+        #stop {
+          box-shadow: 0px 15px 30px 0px rgba(255, 99, 104, 0.5), inset 0px -15px 16px 0px rgba(255, 99, 104, 0.5), inset 0px 7px 15px 0px rgb(255, 122, 127);
+        }
+      </style>
+    </div>
+    <div id="bottomDiv">
+      <div class="flex-center">
+        <div>Last Time:</div>
+        <div id="answertime"></div>
+      </div>
+      <div id="lastanswer"></div>
+      <div id="data">
+        <div class="flex-center">
+          <div>Question Count:</div>
+          <div id="questioncount"></div>
+        </div>
+        <div class="flex-center">
+          <div>Average Time:</div>
+          <div id="averagetime"></div>
+        </div>
+        <div class="flex-center">
+          <div>Score:</div>
+          <div id="score"></div>
+        </div>
+        <div class="flex-center">
+          <div>Total Time:</div>
+          <div id="totaltime">0.0s</div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <!-- import external scripts and mathjax -->
+  <script src="generator.js"></script>
+  <script src="main.js"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</html>
